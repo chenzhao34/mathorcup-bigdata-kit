@@ -59,14 +59,33 @@ python tools/crawl_mathorcup.py
 脚本从官网公告页与赛氪 CDN 抓取原始压缩包，支持断点续传（CDN 会在中途断流）。
 产物不入库，`.gitignore` 已排除 `raw/`、`extracted/`。
 
-## 关于接入 Agent
+## 接入 Modex 一类的桌面 Agent
 
-本仓库的模板是**独立文件**，可直接用于 LaTeX/Word 写作。
+这类应用的竞赛技能是**服务端下发的加密胶囊**，模板在论文步骤开始时才展开到
+`<workspace>/_templates/mathorcup/`。安装目录里没有可改的技能目录，直接丢文件不会生效。
 
-若要注入 Modex 一类的桌面 Agent，需要注意：其竞赛技能包为加密胶囊，模板在运行时才落盘到工作区 `_templates/`，**无法通过往安装目录丢文件生效**。可行路径：
+本仓库提供运行时注入器，在模板落盘的瞬间替换：
 
-1. 等运行时把 `_templates/` 展开后，用同名目录覆盖 `mathorcup/`；
-2. 或向厂商提需求，开放自定义技能目录。
+```bash
+python tools/inject_templates.py --once <工作区目录>   # 单次注入
+python tools/inject_templates.py --watch               # 常驻监听（推荐）
+```
+
+行为：
+
+- 检测到 `_templates/mathorcup/` 出现即替换为大数据赛版
+- 首次覆盖前把原文件备份到 `_templates/.backup_mathorcup/`
+- 写入 `.bigdata_injected` 标记，避免重复注入；若被步骤覆盖会自动补回
+
+Windows 可直接双击 `tools/启动模板注入.cmd`。
+
+开机自启（可选）：
+
+```
+schtasks /create /tn "MathorCupBigDataInjector" /tr "\"D://ModexWork//mathorcup-bigdata-kit//tools//启动模板注入.cmd//"" /sc onlogon
+```
+
+**注意**：这是运行时补丁，不是修改应用本体；升级应用后注入器仍然有效，撤销只需删除该计划任务并恢复备份目录。
 
 ## 数据与版权
 
