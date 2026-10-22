@@ -27,8 +27,23 @@ def log(msg: str) -> None:
     print("[%s] %s" % (time.strftime("%H:%M:%S"), msg), flush=True)
 
 
-def inject(ws: Path, force: bool = False) -> bool:
+def is_bigdata(ws: Path) -> bool:
+    """从工作区 CLAUDE.md 判断是否为大数据赛（避免误伤常规赛）。"""
+    f = ws / "CLAUDE.md"
+    if not f.exists():
+        return False
+    try:
+        t = f.read_text(encoding="utf-8", errors="replace")
+    except Exception:
+        return False
+    keys = ("大数据", "BigData", "bigdata", "MathorCup数学应用挑战赛——大数据")
+    return any(k in t for k in keys)
+
+
+def inject(ws: Path, force: bool = False, check_comp: bool = True) -> bool:
     """把模板写入 ws/_templates/mathorcup/，首次覆盖前备份原文件。"""
+    if check_comp and not force and not is_bigdata(ws):
+        return False
     tmpl_dir = ws / "_templates" / TARGET
     if not tmpl_dir.exists():
         return False
@@ -57,7 +72,7 @@ def inject(ws: Path, force: bool = False) -> bool:
     return True
 
 
-def watch(interval: float = 2.0) -> None:
+def watch(interval: float = 2.0, force: bool = False) -> None:
     log("监听工作区：%s" % ROOT)
     seen: set[str] = set()
     while True:
@@ -69,7 +84,7 @@ def watch(interval: float = 2.0) -> None:
                 if tmpl.exists():
                     key = str(tmpl)
                     if key not in seen:
-                        if inject(ws):
+                        if inject(ws, force=force):
                             seen.add(key)
                     elif not (tmpl / MARK).exists():
                         # 被步骤覆盖后重新注入
@@ -84,7 +99,8 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--once", metavar="WORKSPACE")
     ap.add_argument("--watch", action="store_true")
-    ap.add_argument("--force", action="store_true")
+    ap.add_argument("--force", action="store_true", help="跳过赛事识别，强制注入")
+    ap.add_argument("--all", action="store_true", help="同 --force")
     a = ap.parse_args()
 
     if a.once:
@@ -92,15 +108,17 @@ def main() -> int:
         if not ws.exists():
             print("工作区不存在:", ws)
             return 1
-        ok = inject(ws, force=a.force)
+        ok = inject(ws, force=(a.force or a.all))
         if not ok:
-            print("未注入：%s 下还没有 _templates/%s（等论文步骤开始后再执行）"
-                  % (ws, TARGET))
+            if not is_bigdata(ws):
+                print("已跳过：%s 不像大数据赛（CLAUDE.md 无相关标识）；确需注入加 --force" % ws.name)
+            else:
+                print("未注入：%s 下还没有 _templates/%s（等论文步骤开始后再执行）" % (ws, TARGET))
             return 2
         return 0
 
     if a.watch:
-        watch()
+        watch(force=(a.force or a.all))
         return 0
 
     ap.print_help()
