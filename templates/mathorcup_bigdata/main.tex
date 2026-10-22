@@ -1,0 +1,98 @@
+% !TeX program = xelatex
+% !TeX encoding = UTF-8
+% 2026 MathorCup 数学应用挑战赛——大数据竞赛
+% 结构：封面 → 摘要 → 目录 → 正文 → 参考文献 → 附录
+\documentclass{MathorCupBigData}
+
+\usepackage{amsmath,amssymb,booktabs,graphicx,subcaption}
+\usepackage{algorithm2e}
+\usepackage{float}
+\usepackage[section]{placeins}
+\usepackage{longtable}
+\usepackage{needspace}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,calc}
+
+% ==== 竞赛信息（三处必填）====
+\bianhao{MCB260XXXX}
+\saidao{A}                 % A 或 B
+\timu{在此填写论文题目}
+\keyword{关键词1；关键词2；关键词3；关键词4}
+
+\begin{document}
+
+\makecover
+
+% ==== 摘要（独立一页，建议 600–800 字，逐问一段，含方法名与数值结果）====
+\begin{abstract}
+针对问题一，……（说明数据预处理与建模方法，给出关键数值结果）。
+
+针对问题二，……（说明模型与求解算法，给出指标与对比）。
+
+针对问题三，……（说明优化或预测方案，给出结论量级）。
+
+本文模型在验证集上的主要指标为……，相对基线提升……。
+\end{abstract}
+
+% ==== 目录（大数据赛官方模板保留目录）====
+\tableofcontents
+\clearpage
+
+% ==== 正文 ====
+\section{问题重述}
+\subsection{问题背景}
+\subsection{问题提出}
+
+\section{问题分析}
+\subsection{数据概况}
+\subsection{总体思路}
+
+\section{模型假设}
+\begin{enumerate}
+  \item 假设一：……
+  \item 假设二：……
+\end{enumerate}
+
+\section{符号说明}
+\begin{center}
+\begin{tabular}{clc}
+\toprule
+符号 & 含义 & 单位 \\
+\midrule
+$X$ & 特征矩阵 & -- \\
+$y$ & 目标变量 & -- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{问题一模型的建立与求解}
+\subsection{数据预处理}
+\subsection{模型建立}
+\subsection{求解与结果分析}
+
+\section{问题二模型的建立与求解}
+\subsection{模型建立}
+\subsection{求解与结果分析}
+
+\section{问题三模型的建立与求解}
+\subsection{模型建立}
+\subsection{求解与结果分析}
+
+\section{模型评价与推广}
+\subsection{模型优点}
+\subsection{模型不足}
+\subsection{模型推广}
+
+% ==== 参考文献 ====
+\begin{thebibliography}{99}
+\bibitem{ref1} 作者. 题名[J]. 期刊, 年, 卷(期): 页码.
+\bibitem{ref2} 作者. 书名[M]. 出版地: 出版社, 年.
+\end{thebibliography}
+
+% ==== 附录 ====
+\appendix
+\section{支撑材料清单}
+\section{核心代码}
+% \lstinputlisting[language=Python]{code/main.py}
+
+\end{document}
